@@ -10,15 +10,16 @@ To-do:
 
 Roles:
 
-James: 3
+- James: 3
 
-Abhinav: 1
+- Abhinav: 1
 
-Gabe: 2
+- Gabe: 2
 
 Progress (Update before 3/13/26 Meeting):
-James: About 40% Complete with IP Messaging scripts.
 
-Abhinav: _
+- James: About 40% Complete with IP Messaging scripts.
 
-Gabe: _
+- Abhinav: _
+
+- Gabe: _
