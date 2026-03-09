@@ -9,7 +9,7 @@ To-do:
 5. Simulation
 6. Build the finalized app into an executable file (.exe)
 
-Note: For 6, input the following lines in the Command Line Interface, replacing main.py with the main python file name:
+For 6, input the following lines in the Command Line Interface, replacing main.py with the main python file name:
 
 ```CLI
 python main.py
@@ -17,9 +17,7 @@ pip install pyinstaller
 pyinstaller --onefile main.py
 ```
 
-This will create a *dist* folder containing *main.exe* (or *YOUR_FILE_NAME.py*), which is an executable file.
-
-
+This will create a *dist* folder containing *main.exe* (or *YOUR_FILE_NAME.py*), which is an executable file. If you already have pyinstaller installed and you don't need to test the file, ignore lines 1 and 2 and only run line 3.
 
 Roles:
 
