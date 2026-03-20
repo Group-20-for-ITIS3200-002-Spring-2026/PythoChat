@@ -19,6 +19,7 @@ def recieve_data():
       # For testing we will use text first.
       print(f"\n[Client]: {data}")
       print("Your Message: ", end='', flush=True)
+      notification.notify(title="New Message!", message={data}, app_name="PythoChat", timeout=10)
     except:
       break
   print("Client has disconnected.")
