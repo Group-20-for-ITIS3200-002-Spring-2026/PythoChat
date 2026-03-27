@@ -33,4 +33,4 @@ Progress (Update before 3/13/26 Meeting):
 
 - Abhinav: 100% Done with text encryption.
 
-- Gabe: _
+- Gabe: 100% Done with image encryption and decryption.
