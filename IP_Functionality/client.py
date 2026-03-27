@@ -3,6 +3,7 @@
 import socket
 import threading
 import sys
+from plyer import notification
 
 # External scripts go here:
 # Examples:
@@ -20,6 +21,7 @@ def recieve_data(sock):
       # For testing we will use text first.
       print(f"\n[Server]: {data}")
       print("Your Message: ", end='', flush=True)
+      notification.notify(title="New Message!", message={data}, app_name="PythoChat", timeout=10)
     except:
       break
   print("Server has disconnected")
