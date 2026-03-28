@@ -2,9 +2,12 @@
 
 import socket
 import threading
+import struct
 import sys
 from plyer import notification
 from text_encryption import encrypt_message, decrypt_message, derive_key
+from image_encryption import encrypt_image, decrypt_image
+from PIL import Image
 
 # External scripts go here:
 # Examples:
@@ -17,41 +20,80 @@ def recieve_data(sock):
   # Acts like the server version, but instead receives data from the server.
   while True:
     try:
-      data = sock.recv(4096)
-      if not data:
+      header = sock.recv(12)
+      if not header:
         break
-      # Logic for determining type of data. Requires the use of external scripts to decrypt messages.
-      # For testing we will use text first.
-      payload = data[:-32]
-      recv_hash = data[-32:]
-      message = decrypt_message(payload, recv_hash, SHARED_KEY)
+      msg_type, length = struct.unpack("!4sQ", header)
+      msg_type = msg_type.decode()
+      data = b''
+      while len(data) < length:
+        packet = sock.recv(4096)
+        if not packet:
+          break
+        data += packet
 
-      print(f"\n[Server]: {message}")
-      print("Your Message: ", end='', flush=True)
-      notification.notify(title="New Message from Server", message={message}, app_name="PythoChat", timeout=10)
+      if msg_type == "TEXT":
+        payload = data[:-32]
+        recv_hash = data[-32:]
+        message = decrypt_message(payload, recv_hash, SHARED_KEY)
+        print(f"\n[Server]: {message}")
+        print("Your Message: ", end='', flush=True)
+        notification.notify(title="New Message from Server", message={message}, app_name="PythoChat", timeout=10)
+      elif msg_type == "IMAGE":
+        payload = data[:-32]
+        recv_hash = data[-32:]
+        image = decrypt_image(payload, h, SHARED_KEY)
+
+        image.show()
+        print("\n[Server sent an image]")
+        print("Your Message: ", end='', flush=True)
+
     except:
       break
   print("Server has disconnected")
   sock.close()
 
+def send_text(sock, message):
+  payload, hash = encrypt_message(message, SHARED_KEY)
+  data = payload + hash
+  header = struct.pack("!4sQ", b"TEXT", len(data))
+  sock.sendall(header + data)
+
+def send_image(sock, path):
+  try:
+    image = Image.open(path)
+    payload, hash = encrypt_image(image, SHARED_KEY)
+    data = payload + hash
+
+    header = struct.pack("!4sQ", b"IMAGE", len(data))
+    sock.sendall(header + data)
+
+  except Exception as e:
+    print(f"Failed to send image: {e}")
+
 def send_data(sock):
   while True:
     try:
       message = input("Your Message: ")
-      if message.lower() == "exit":
-        print("Exiting...")
-        payload, hash = encrypt_message(message, SHARED_KEY)
-        sock.sendall(payload + hash)
-    except:
+      if message.startswith("/sendimage "):
+        path = message[len("/sendimage "):].strip()
+        send_image(sock)
+      elif message.startswith("/sendtext "):
+        send_text(sock)
+      elif message == "/quit":
+        print("Disconnecting from server...")
+        sock.close()
+        break
+      else:
+        print("Invalid command. Use /sendtext <message> or /sendimage <path> or /quit.")
+    except Exception as e:
+      print(f"Error sending data: {e}")
       break
-
-  sock.close()
-
-
 
 def client_script():
   host = input("Enter the IP ADDRESS value: ")
   port = input("Enter the PORT value: ")
+  
   client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   client_socket.connect((host, port))
   print(f"\nConnected to {host}:{port}")
@@ -62,10 +104,7 @@ def client_script():
   threading.Thread(target=send_data, args=(client_socket,), daemon=True).start()
 
   while True:
-    if(not client_socket.fileno()):
-      break
-  
-  client_socket.close()
+    pass
 
 if __name__ == '__main__':
   client_script()

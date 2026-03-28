@@ -1,10 +1,11 @@
 # Found these based on research of Python libraries. May/May Not Use all of them.
 import socket
 import threading
-import sys
-import random
+import struct
 from plyer import notification
 from text_encryption import encrypt_message, decrypt_message, derive_key
+from image_encryption import encrypt_image, decrypt_image
+from PIL import Image
 
 # Import external scripts here:
 # Example: import other_script
@@ -19,33 +20,57 @@ def handle_client(conn, addr):
 
   while True:
     try:
-      data = conn.recv(4096)
-      if not data:
+      header = conn.recv(12)
+      if not header:
         break
 
-      payload = data[:-32]
-      recv_hash = data[-32:]
+      msg_type, length = struct.unpack("!4sQ", header)
+      msg_type = msg_type.decode()
 
-      message = decrypt_message(payload, recv_hash, SHARED_KEY)
-      print(f"\n[{addr}]: {message}")
-      print("Your Message: ", end='', flush=True)
-      notification.notify(title=f"New Message from {addr}", message={message}, app_name="PythoChat", timeout=10)
+      data = b''
+      while len(data) < length:
+        packet = conn.recv(4096)
+        if not packet:
+          break
+        data += packet
 
-      broadcast(conn, message)
+      if msg_type == "TEXT":
+        payload = data[:-32]
+        recv_hash = data[-32:]
+
+        message = decrypt_message(payload, recv_hash, SHARED_KEY)
+        if message:
+          print(f"\n[{addr}]: {message}")
+          print("Your Message: ", end='', flush=True)
+          notification.notify(title=f"New Message from {addr}", message={message}, app_name="PythoChat", timeout=10)
+          broadcast(conn, "TEXT", data)
+
+        elif msg_type == "IMAGE":
+          payload = data[:-32]
+          recv_hash = data[-32:]
+
+          image = decrypt_image(payload, recv_hash, SHARED_KEY)
+          if image:
+            image.show()
+            print(f"\n[{addr} sent an image]")
+            print("Your Message: ", end='', flush=True)
+            notification.notify(title=f"New Image from {addr}", message="You received a new image.", app_name="PythoChat", timeout=10)
+            broadcast(conn, "IMAGE", data)
     except:
       break
 
-  print(f"Client {addr} disconnected.")
   clients.remove(conn)
   conn.close()
+  print(f"Client {addr} disconnected.")
 
-def broadcast(sender_conn, message):
-  payload, hash = encrypt_message(message, SHARED_KEY)
-  data = payload + hash
+def broadcast(sender_conn, msg_type, data):
+  header = struct.pack("!4sQ", msg_type.encode(), len(data))
+  packet = header + data
+  
   for client in clients:
     if client != sender_conn:
       try:
-        client.sendall(data)
+        client.sendall(packet)
       except:
         pass
 
