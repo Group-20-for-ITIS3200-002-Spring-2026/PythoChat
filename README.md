@@ -19,6 +19,12 @@ pyinstaller --onefile main.py
 
 This will create a *dist* folder containing *main.exe* (or *YOUR_FILE_NAME.py*), which is an executable file. If you already have pyinstaller installed and you don't need to test the file, ignore lines 1 and 2 and only run line 3.
 
+Alternatively, you can also rename the file like the example below, and then double-clicking said file:
+
+```CLI
+main.pyw
+```
+
 Roles:
 
 - James: 3, 4
