@@ -14,8 +14,6 @@ from PIL import Image
 #   import other_script
 #   import
 
-SHARED_KEY = derive_key(123456)
-
 def recieve_data(sock):
   # Acts like the server version, but instead receives data from the server.
   while True:
@@ -101,7 +99,7 @@ def client_script():
   print(" Performing key exchange...")
 
   # DH parameters (simple version)
-  p = 23
+  p = 13240666412895696007
   g = 5
   private_key = random.randint(1, 100)
 
