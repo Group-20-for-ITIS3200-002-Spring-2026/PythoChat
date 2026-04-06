@@ -25,6 +25,8 @@ Alternatively, you can also rename the file like the example below, and then dou
 main.pyw
 ```
 
+However, replacing .py with .pyw will force the file to run without opening the command prompt, which may become an issue for certain files (such as ours).
+
 Roles:
 
 - James: 3, 4
@@ -33,9 +35,9 @@ Roles:
 
 - Gabe: 2
 
-Progress (Update before 3/13/26 Meeting):
+Progress (Update after each work session):
 
-- James: About 40% Complete with IP Messaging scripts. 0% Complete for Main python file.
+- James: About 100% Complete with IP Messaging scripts. 0% Complete for Main python file.
 
 - Abhinav: 100% Done with text encryption..
 
