@@ -5,7 +5,7 @@ import threading
 import struct
 import sys
 from plyer import notification
-from text_encryption import encrypt_message, decrypt_message, derive_key
+from text_encryption import encrypt_message, decrypt_message, derive_key, generate_public_key, generate_shared_key
 from image_encryption import encrypt_image, decrypt_image
 from PIL import Image
 
@@ -98,6 +98,31 @@ def client_script():
   client_socket.connect((host, port))
   print(f"\nConnected to {host}:{port}")
 
+  print(" Performing key exchange...")
+
+  # DH parameters (simple version)
+  p = 23
+  g = 5
+  private_key = random.randint(1, 100)
+
+  public_key = generate_public_key(private_key, g, p)
+
+  # Send (p, g, A)
+  send_dh(sock, p, g, public_key)
+
+  # Receive B
+  header = recv_exact(sock, 12)
+  msg_type, length = struct.unpack("!4sQ", header)
+  data = recv_exact(sock, length)
+
+  server_public = int(data.decode())
+
+  shared = generate_shared_key(server_public, private_key, p)
+  global SHARED_KEY
+  SHARED_KEY = derive_key(shared)
+
+  print("Secure connection established.")
+  
   # Receive thread goes here. It will handle receiving data.
   threading.Thread(target=recieve_data, args=(client_socket,), daemon=True).start()
   # Send thread logic goes here. Will probably just be a while loop.
@@ -108,4 +133,3 @@ def client_script():
 
 if __name__ == '__main__':
   client_script()
-  
