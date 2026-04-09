@@ -1,13 +1,10 @@
-# ITIS3200-Project
-Python-based.
+# PythoChat
+Python-based Secure MMS Application with Cyberattack Simulation.
 
 To-do:
-1. Text Encryption/Decryption
-2. Image Encryption/Decryption
-3. IP-based Send/Receive Messaging
-4. main.py File
-5. Simulation
-6. Build the finalized app into an executable file (.exe)
+1. main.py File
+2. Simulation
+3. Build the finalized app into an executable file (.exe)
 
 For 6, input the following lines in the Command Line Interface, replacing main.py with the main python file name:
 
@@ -29,16 +26,16 @@ However, replacing .py with .pyw will force the file to run without opening the 
 
 Roles:
 
-- James: 3, 4
+- James: 1, 3, Docmentation
 
-- Abhinav: 1
+- Abhinav: 2, Docmentation
 
-- Gabe: 2
+- Gabe: Documentation
 
 Progress (Update after each work session):
 
-- James: About 100% Complete with IP Messaging scripts. 0% Complete for Main python file.
+- James: I'm ~80% done with the pythochat_main.py file, but I need siumlation file before continuing.
 
-- Abhinav: 100% Done with text encryption..
+- Abhinav: 100% Done with text encryption.
 
 - Gabe: 100% Done with image encryption and decryption.
