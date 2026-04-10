@@ -36,6 +36,6 @@ Progress (Update after each work session):
 
 - James: I'm ~80% done with the pythochat_main.py file, but I need siumlation file before continuing.
 
-- Abhinav: 100% Done with text encryption.
+- Abhinav: 100% Done with text encryption and simulation.
 
 - Gabe: 100% Done with image encryption and decryption.
