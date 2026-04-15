@@ -108,13 +108,13 @@ def broadcast(sender, msg_type, data):
 # May use port value as a randomly-generated value above 1024 and at most 65000.
 def server_script():
   host = input("Enter the IP ADDRESS value: ")
-  port = input("Enter the PORT value: ")
 
+  print("Alpha")
   server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-  server_socket.bind((host, port))
+  server_socket.bind((host, 8080))
   server_socket.listen(5)
-
-  print(f"Server started on {host}:{port}. Waiting for connections...")
+  
+  print(f"Server started on {host}:8080. Waiting for connections...")
 
   while True:
     conn, addr = server_socket.accept()
