@@ -1,132 +1,171 @@
-# This file is very likely to change a lot, this is more of a basic idea of what we will need to implement.
-
+import random
 import socket
 import threading
 import struct
-import sys
-from plyer import notification
-from text_encryption import encrypt_text, decrypt_text, derive_key, generate_public_key, generate_shared_key
+import time
+# from plyer import notification
+from text_encryption import (
+    encrypt_text, decrypt_text,
+    derive_key, generate_public_key, generate_shared_key
+)
 from image_encryption import encrypt_image, decrypt_image
 from PIL import Image
+from io import BytesIO
 
-# External scripts go here:
-# Examples:
-#   import other_script
-#   import
+SHARED_KEY = None
 
-def recieve_data(sock):
-  # Acts like the server version, but instead receives data from the server.
-  while True:
-    try:
-      header = sock.recv(12)
-      if not header:
-        break
-      msg_type, length = struct.unpack("!4sQ", header)
-      msg_type = msg_type.decode()
-      data = b''
-      while len(data) < length:
-        packet = sock.recv(4096)
-        if not packet:
-          break
-        data += packet
+# --- Helper Functions ---
 
-      if msg_type == "TEXT":
-        payload = data[:-32]
-        recv_hash = data[-32:]
-        message = decrypt_text(payload, recv_hash, SHARED_KEY)
-        print(f"\n[Server]: {message}")
-        print("Your Message: ", end='', flush=True)
-        notification.notify(title="New Message from Server", message={message}, app_name="PythoChat", timeout=10)
-      elif msg_type == "IMAGE":
-        payload = data[:-32]
-        recv_hash = data[-32:]
-        image = decrypt_image(payload, h, SHARED_KEY)
-
-        image.show()
-        print("\n[Server sent an image]")
-        print("Your Message: ", end='', flush=True)
-
-    except:
-      break
-  print("Server has disconnected")
-  sock.close()
-
-def send_text(sock, message):
-  payload, hash = encrypt_text(message, SHARED_KEY)
-  data = payload + hash
-  header = struct.pack("!4sQ", b"TEXT", len(data))
-  sock.sendall(header + data)
-
-def send_image(sock, path):
-  try:
-    image = Image.open(path)
-    payload, hash = encrypt_image(image, SHARED_KEY)
-    data = payload + hash
-
-    header = struct.pack("!4sQ", b"IMAGE", len(data))
+def send_dh(sock, p, g, public_key):
+    data = f"{p},{g},{public_key}".encode()
+    header = struct.pack("!4sQ", b"DHKE", len(data))
     sock.sendall(header + data)
 
-  except Exception as e:
-    print(f"Failed to send image: {e}")
+def recv_exact(sock, size):
+    data = b''
+    while len(data) < size:
+        packet = sock.recv(size - len(data))
+        if not packet:
+            return None
+        data += packet
+    return data
+
+# --- Receive Thread ---
+
+def receive_data(sock):
+    while True:
+        try:
+            header = recv_exact(sock, 12)
+            if not header:
+                break
+
+            msg_type, length = struct.unpack("!4sQ", header)
+            msg_type = msg_type.decode()
+
+            data = recv_exact(sock, length)
+            if not data:
+                break
+
+            if msg_type == "TEXT":
+                payload = data[:-32]
+                recv_hash = data[-32:]
+
+                message = decrypt_text(payload, recv_hash, SHARED_KEY)
+                if message:
+                    print(f"\n[Server]: {message}")
+
+                print("Your Message: ", end='', flush=True)
+
+            elif msg_type == "IMAGE":
+                payload = data[:-32]
+                recv_hash = data[-32:]
+
+                image = decrypt_image(payload, recv_hash, SHARED_KEY)
+                if image:
+                    image.show()
+                    print("\n[Server sent an image]")
+
+                print("Your Message: ", end='', flush=True)
+
+        except:
+            break
+
+    print("\nDisconnected from server.")
+    sock.close()
+
+# --- Send Functions ---
+
+def send_text(sock, message):
+    payload, h = encrypt_text(message, SHARED_KEY)
+    data = payload + h
+
+    header = struct.pack("!4sQ", b"TEXT", len(data))
+    sock.sendall(header + data)
+
+def send_image(sock, path):
+    try:
+        image = Image.open(path)
+        payload, h = encrypt_image(image, SHARED_KEY)
+        data = payload + h
+
+        header = struct.pack("!4sQ", b"IMAGE", len(data))
+        sock.sendall(header + data)
+
+    except Exception as e:
+        print(f"Failed to send image: {e}")
+
+        
 
 def send_data(sock):
-  while True:
-    try:
-      message = input("Your Message: ")
-      if message.startswith("/sendimage "):
-        path = message[len("/sendimage "):].strip()
-        send_image(sock)
-      elif message.startswith("/sendtext "):
-        send_text(sock)
-      elif message == "/quit":
-        print("Disconnecting from server...")
-        sock.close()
-        break
-      else:
-        print("Invalid command. Use /sendtext <message> or /sendimage <path> or /quit.")
-    except Exception as e:
-      print(f"Error sending data: {e}")
-      break
+    while True:
+        try:
+            message = input("Your Message: ")
+
+            if message.startswith("/sendimage "):
+                path = message[len("/sendimage "):].strip()
+                send_image(sock, path)
+
+            elif message.startswith("/sendtext "):
+                send_text(sock, message[len("/sendtext "):].strip())
+
+            elif message == "/quit":
+                print("Disconnecting...")
+                sock.close()
+                break
+
+            else:
+                print("Commands:")
+                print("  /sendtext <message>")
+                print("  /sendimage <path>")
+                print("  /quit")
+
+        except Exception as e:
+            print(f"Error: {e}")
+            break
+
+# --- Main Client ---
 
 def client_script():
-  host = input("Enter the IP ADDRESS value: ")
-  
-  client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-  client_socket.connect((host, 8080))
-  print(f"\nConnected to {host}:8080")
+    host = input("Enter the IP ADDRESS: ")
 
-  print(" Performing key exchange...")
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((host, 8080))
 
-  # DH parameters (simple version)
-  p = 13240666412895696007
-  g = 5
-  private_key = random.randint(1, 100)
+    print(f"Connected to {host}:8080")
+    print("Performing key exchange...")
 
-  public_key = generate_public_key(private_key, g, p)
+    # Diffie-Hellman parameters
+    p = 13240666412895696007
+    g = 5
+    private_key = random.randint(2**100, 2**200)
 
-  # Send (p, g, A)
-  send_dh(sock, p, g, public_key)
+    public_key = generate_public_key(private_key, g, p)
 
-  # Receive B
-  header = recv_exact(sock, 12)
-  msg_type, length = struct.unpack("!4sQ", header)
-  data = recv_exact(sock, length)
+    # Send DH
+    send_dh(client_socket, p, g, public_key)
 
-  server_public = int(data.decode())
+    # Receive server public key
+    header = recv_exact(client_socket, 12)
+    msg_type, length = struct.unpack("!4sQ", header)
 
-  shared = generate_shared_key(server_public, private_key, p)
-  global SHARED_KEY
-  SHARED_KEY = derive_key(shared)
+    data = recv_exact(client_socket, length)
+    server_public = int(data.decode())
 
-  print("Secure connection established.")
-  
-  # Receive thread goes here. It will handle receiving data.
-  threading.Thread(target=recieve_data, args=(client_socket,), daemon=True).start()
-  # Send thread logic goes here. Will probably just be a while loop.
-  threading.Thread(target=send_data, args=(client_socket,), daemon=True).start()
+    shared = generate_shared_key(server_public, private_key, p)
 
-  while True:
-    pass
+    global SHARED_KEY
+    SHARED_KEY = derive_key(shared)
+
+    print("Secure connection established.")
+
+    # Threads
+    threading.Thread(target=receive_data, args=(client_socket,), daemon=True).start()
+    threading.Thread(target=send_data, args=(client_socket,), daemon=True).start()
+
+    while True:
+        time.sleep(1)
+
+# --- Run ---
 
 if __name__ == '__main__':
-  client_script()
+    client_script()

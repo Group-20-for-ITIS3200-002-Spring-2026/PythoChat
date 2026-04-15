@@ -5,53 +5,49 @@ from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 from Crypto.Hash import SHA256, HMAC
 
-# Generates Public Key of User 1 and User 2
+# Generates Public Key
 def generate_public_key(private_key, g, p):
-    return pow(g,private_key,p)
+    return pow(g, private_key, p)
 
-# Generates Shared Key of User 1 and User 2
+# Generates Shared Key
 def generate_shared_key(other_user_public_key, private_key, p):
     return pow(other_user_public_key, private_key, p)
 
-# Adding bytes to the shared key, so that it can be used in AES encryption.
+# Derives AES key from shared key
 def derive_key(shared_key):
     h = SHA256.new()
     h.update(str(shared_key).encode())
-    return h.digest()
+    return h.digest()  # 32 bytes (AES-256)
 
-# Encryptes the message
+# Encrypt text with AES + HMAC
 def encrypt_text(message, key):
-    # Uses AES to encrypt message.
-    cipher = AES.new(key,AES.MODE_CBC)
+    cipher = AES.new(key, AES.MODE_CBC)
     ciphertext = cipher.encrypt(pad(message.encode(), AES.block_size))
-    C =  cipher.iv + ciphertext
+    C = cipher.iv + ciphertext
 
-    # HMAC the C
-    h = HMAC.new(key,C, digestmod = SHA256)
+    # HMAC
+    h = HMAC.new(key, C, digestmod=SHA256)
     mac = h.digest()
 
-    # Hash the HMAC
+    # Final hash
     H = SHA256.new(mac).digest()
+
     return C, H
 
-# Decryptes the text
+# Decrypt text with verification
 def decrypt_text(C, H, key):
-    iv = C[0:16]
+    iv = C[:16]
     ciphertext = C[16:]
+
     cipher = AES.new(key, AES.MODE_CBC, iv)
-    message =  unpad(cipher.decrypt(ciphertext), AES.block_size).decode()
+    message = unpad(cipher.decrypt(ciphertext), AES.block_size).decode()
 
-    # Recomupute the C
-    h = HMAC.new(key,C, digestmod = SHA256)
+    # Recompute HMAC
+    h = HMAC.new(key, C, digestmod=SHA256)
     mac = h.digest()
-
-    # Hash the HMAC
     computed_H = SHA256.new(mac).digest()
 
-    # Check if re-computed H matches with H sent to us
     if computed_H == H:
-        print("Message Verified")
         return message
     else:
-        print("Integrity Failed")
         return None
