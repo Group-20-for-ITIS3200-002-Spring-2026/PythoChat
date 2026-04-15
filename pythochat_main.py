@@ -39,7 +39,7 @@ def main():
       run_client()
     elif choice == "3":
       # Replace with actual function
-      print("Simulation is WIP, please select a different option.")
+      run_simulation()
     elif choice == "4":
       sys.exit(0)
     else:
