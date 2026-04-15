@@ -11,7 +11,7 @@ For 6, input the following lines in the Command Line Interface, replacing main.p
 ```CLI
 python main.py
 pip install pyinstaller
-pyinstaller --onefile main.py
+python -m PyInstaller --onefile main.py
 ```
 
 This will create a *dist* folder containing *main.exe* (or *YOUR_FILE_NAME.py*), which is an executable file. If you already have pyinstaller installed and you don't need to test the file, ignore lines 1 and 2 and only run line 3.
