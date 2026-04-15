@@ -3,6 +3,7 @@ import threading
 
 import server
 import client
+import simulation
 
 def run_host():
   try:
@@ -15,6 +16,12 @@ def run_client():
     client.client_script()
   except Exception as e:
     print(f"Client error: {e}")
+
+def run_simulation():
+  try:
+    simulation.simulate_text_messaging()
+  except Exception as e:
+    print(f"Simulation error: {e}")
 
 def main():
   while True:
