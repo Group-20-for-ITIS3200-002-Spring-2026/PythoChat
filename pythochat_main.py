@@ -1,8 +1,8 @@
 import sys
 import threading
 
-import server
-import client
+import IP_Functionality.server as server
+import IP_Functionality.client as client
 import simulation
 
 def run_host():
@@ -31,7 +31,7 @@ def main():
     print("3. Simulate Cyberattack")
     print("4. Exit Application")
 
-    choice = input("Select an option").strip()
+    choice = input("Select an option: ").strip()
 
     if choice == "1":
       run_host()

@@ -3,7 +3,7 @@ import socket
 import threading
 import struct
 from plyer import notification
-from text_encryption import encrypt_message, decrypt_message, derive_key, generate_public_key, generate_shared_key
+from text_encryption import encrypt_text, decrypt_text, derive_key, generate_public_key, generate_shared_key
 from image_encryption import encrypt_image, decrypt_image
 from PIL import Image
 
@@ -57,7 +57,7 @@ def handle_client(conn, addr):
         payload = data[:-32]
         recv_hash = data[-32:]
 
-        message = decrypt_message(payload, recv_hash, SHARED_KEY)
+        message = decrypt_text(payload, recv_hash, SHARED_KEY)
         if message:
           print(f"\n[{addr}]: {message}")
           print("Your Message: ", end='', flush=True)
@@ -98,8 +98,8 @@ def broadcast(sender, msg_type, data):
                   # images already encrypted; forward directly
                   new_data = data
 
-                header = struct.pack("!4sQ", msg_type.encode(), len(new_data))
-                client.sendall(header + new_data)
+              header = struct.pack("!4sQ", msg_type.encode(), len(new_data))
+              client.sendall(header + new_data)
 
           except:
               pass

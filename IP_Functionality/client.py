@@ -5,7 +5,7 @@ import threading
 import struct
 import sys
 from plyer import notification
-from text_encryption import encrypt_message, decrypt_message, derive_key, generate_public_key, generate_shared_key
+from text_encryption import encrypt_text, decrypt_text, derive_key, generate_public_key, generate_shared_key
 from image_encryption import encrypt_image, decrypt_image
 from PIL import Image
 
@@ -33,7 +33,7 @@ def recieve_data(sock):
       if msg_type == "TEXT":
         payload = data[:-32]
         recv_hash = data[-32:]
-        message = decrypt_message(payload, recv_hash, SHARED_KEY)
+        message = decrypt_text(payload, recv_hash, SHARED_KEY)
         print(f"\n[Server]: {message}")
         print("Your Message: ", end='', flush=True)
         notification.notify(title="New Message from Server", message={message}, app_name="PythoChat", timeout=10)
@@ -52,7 +52,7 @@ def recieve_data(sock):
   sock.close()
 
 def send_text(sock, message):
-  payload, hash = encrypt_message(message, SHARED_KEY)
+  payload, hash = encrypt_text(message, SHARED_KEY)
   data = payload + hash
   header = struct.pack("!4sQ", b"TEXT", len(data))
   sock.sendall(header + data)
