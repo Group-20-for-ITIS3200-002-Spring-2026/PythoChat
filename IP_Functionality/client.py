@@ -90,11 +90,10 @@ def send_data(sock):
 
 def client_script():
   host = input("Enter the IP ADDRESS value: ")
-  port = input("Enter the PORT value: ")
   
   client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-  client_socket.connect((host, port))
-  print(f"\nConnected to {host}:{port}")
+  client_socket.connect((host, 8080))
+  print(f"\nConnected to {host}:8080")
 
   print(" Performing key exchange...")
 

@@ -109,7 +109,6 @@ def broadcast(sender, msg_type, data):
 def server_script():
   host = input("Enter the IP ADDRESS value: ")
 
-  print("Alpha")
   server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   server_socket.bind((host, 8080))
   server_socket.listen(5)
