@@ -9,7 +9,7 @@ To-do:
 For 6, input the following lines in the Command Line Interface, replacing main.py with the main python file name:
 
 ```CLI
-python main.py
+python -m PyInstaller --onefile main.py
 pip install pyinstaller
 pyinstaller --onefile main.py
 ```
