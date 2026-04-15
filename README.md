@@ -34,7 +34,7 @@ Roles:
 
 Progress (Update after each work session):
 
-- James: I'm ~80% done with the pythochat_main.py file, but I need siumlation file before continuing.
+- James: I'm 100% done with the pythochat_main.py file. I'm now testing the files to ensure that they work.
 
 - Abhinav: 100% Done with text encryption and simulation.
 
