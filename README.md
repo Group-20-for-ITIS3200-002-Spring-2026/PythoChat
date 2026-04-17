@@ -1,41 +1,27 @@
 # PythoChat
 Python-based Secure MMS Application with Cyberattack Simulation.
 
-To-do:
-1. main.py File
-2. Simulation
-3. Build the finalized app into an executable file (.exe)
+# Instructions:
+When running the executable, you will be given 4 options:
 
+1. Host - This creates a server which will allow you to connect multiple clients (SUCCESS CASE).
+2. Client - This allows you to act as a client which makes you connect to a server to chat with other clients (SUCCESS CASE).
+3. Simulate Cyberattack - This allows you to simulate a cyberattack (FAILURE CASE).
+4. Exit Application - This allows you to exit the application.
+
+Choose the option you would like. If you chose Host, input 0.0.0.0 to allow a connection from any network adapter. If you chose Client, input the IP address of the server machine's IP address. If you don't know what your machine's IP address is, type the following into your terminal:
+1. Mac/Linux: ifconfig
+2. Windows: ipconfig
+
+NOTE: If you are unable to connect between two computers (one with Host and one with Client), make sure that your firewall is disabled, as it will prevent the file from working properly, and also change your network profile type to the "Private" option.
+
+# Build
 For 6, input the following lines in the Command Line Interface, replacing main.py with the main python file name:
 
-```CLI
-python main.py
+```
+python pythochat_main.py
 pip install pyinstaller
-python -m PyInstaller --onefile main.py
+python -m PyInstaller --onefile pythochat_main.py
 ```
 
-This will create a *dist* folder containing *main.exe* (or *YOUR_FILE_NAME.py*), which is an executable file. If you already have pyinstaller installed and you don't need to test the file, ignore lines 1 and 2 and only run line 3.
-
-Alternatively, you can also rename the file like the example below, and then double-clicking said file:
-
-```CLI
-main.pyw
-```
-
-However, replacing .py with .pyw will force the file to run without opening the command prompt, which may become an issue for certain files (such as ours).
-
-Roles:
-
-- James: 1, 3, Docmentation
-
-- Abhinav: 2, Docmentation
-
-- Gabe: Documentation
-
-Progress (Update after each work session):
-
-- James: I'm 100% done with the pythochat_main.py file. I'm now testing the files to ensure that they work.
-
-- Abhinav: 100% Done with text encryption and simulation.
-
-- Gabe: 100% Done with image encryption and decryption.
+This will create a *dist* folder containing *pythochat_main.exe*, which is an executable file. If you already have pyinstaller installed and you don't need to test the file, ignore lines 1 & 2 and only run line 3.
