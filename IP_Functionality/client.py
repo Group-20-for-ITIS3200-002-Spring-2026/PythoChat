@@ -58,6 +58,7 @@ def receive_data(sock):
                 print("Your Message: ", end='', flush=True)
 
             elif msg_type == "IMAG":
+                print("Received an image from the server.")
                 payload = data[:-32]
                 recv_hash = data[-32:]
                 
@@ -130,9 +131,9 @@ def client_script():
     host = input("Enter the IP ADDRESS: ")
 
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((host, 8080))
+    client_socket.connect((host, 65432))
 
-    print(f"Connected to {host}:8080")
+    print(f"Connected to {host}:65432")
     print("Performing key exchange...")
 
     # Diffie-Hellman parameters
