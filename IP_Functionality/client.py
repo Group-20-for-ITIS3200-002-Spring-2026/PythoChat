@@ -3,6 +3,7 @@ import socket
 import threading
 import struct
 import time
+import traceback
 # from plyer import notification
 from text_encryption import (
     encrypt_text, decrypt_text,
@@ -38,10 +39,10 @@ def receive_data(sock):
             header = recv_exact(sock, 12)
             if not header:
                 break
-
+            
             msg_type, length = struct.unpack("!4sQ", header)
             msg_type = msg_type.decode()
-
+            
             data = recv_exact(sock, length)
             if not data:
                 break
@@ -56,10 +57,10 @@ def receive_data(sock):
 
                 print("Your Message: ", end='', flush=True)
 
-            elif msg_type == "IMAGE":
+            elif msg_type == "IMAG":
                 payload = data[:-32]
                 recv_hash = data[-32:]
-
+                
                 image = decrypt_image(payload, recv_hash, SHARED_KEY)
                 if image:
                     image.show()
@@ -67,7 +68,7 @@ def receive_data(sock):
 
                 print("Your Message: ", end='', flush=True)
 
-        except:
+        except Exception:
             break
 
     print("\nDisconnected from server.")
@@ -88,7 +89,7 @@ def send_image(sock, path):
         payload, h = encrypt_image(image, SHARED_KEY)
         data = payload + h
 
-        header = struct.pack("!4sQ", b"IMAGE", len(data))
+        header = struct.pack("!4sQ", b"IMAG", len(data))
         sock.sendall(header + data)
 
     except Exception as e:

@@ -62,7 +62,7 @@ def handle_client(conn, addr):
 
             msg_type, length = struct.unpack("!4sQ", header)
             msg_type = msg_type.decode()
-
+            
             data = recv_exact(conn, length)
             if not data:
                 break
@@ -76,7 +76,7 @@ def handle_client(conn, addr):
                     print(f"\n[{addr}]: {message}")
                     broadcast(conn, "TEXT", message)
 
-            elif msg_type == "IMAGE":
+            elif msg_type == "IMAG":
                 payload = data[:-32]
                 recv_hash = data[-32:]
 
@@ -84,7 +84,7 @@ def handle_client(conn, addr):
                 if image:
                     image.show()
                     print(f"\n[{addr}] sent an image")
-                    broadcast(conn, "IMAGE", data, is_raw=True)
+                    broadcast(conn, "IMAG", data, is_raw=True)
 
     except:
         pass
@@ -109,7 +109,7 @@ def broadcast(sender, msg_type, content, is_raw=False):
                     payload, h = encrypt_text(content, key)
                     new_data = payload + h
 
-                elif msg_type == "IMAGE" and is_raw:
+                elif msg_type == "IMAG" and is_raw:
                     # Already encrypted, just forward
                     new_data = content
 
