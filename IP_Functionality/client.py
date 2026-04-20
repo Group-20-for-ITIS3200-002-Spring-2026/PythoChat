@@ -117,6 +117,7 @@ def send_data(sock):
 
             else:
                 print("Commands:")
+                print("  /t <message>")
                 print("  /i <path>")
                 print("  /quit")
 
