@@ -103,12 +103,12 @@ def send_data(sock):
         try:
             message = input("Your Message: ")
 
-            if message.startswith("/sendimage "):
-                path = message[len("/sendimage "):].strip()
+            if message.startswith("/i "):
+                path = message[len("/i "):].strip()
                 send_image(sock, path)
 
-            elif message.startswith("/sendtext "):
-                send_text(sock, message[len("/sendtext "):].strip())
+            elif message.startswith("/t "):
+                send_text(sock, message[len("/t "):].strip())
 
             elif message == "/quit":
                 print("Disconnecting...")
@@ -117,8 +117,7 @@ def send_data(sock):
 
             else:
                 print("Commands:")
-                print("  /sendtext <message>")
-                print("  /sendimage <path>")
+                print("  /i <path>")
                 print("  /quit")
 
         except Exception as e:
