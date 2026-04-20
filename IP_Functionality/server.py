@@ -84,7 +84,7 @@ def handle_client(conn, addr):
                 if image:
                     image.show()
                     print(f"\n[{addr}] sent an image")
-                    broadcast(conn, "IMAG", data, is_raw=True)
+                    broadcast(conn, "IMAG", image, is_raw=True)
 
     except:
         pass
@@ -110,8 +110,9 @@ def broadcast(sender, msg_type, content, is_raw=False):
                     new_data = payload + h
 
                 elif msg_type == "IMAG" and is_raw:
-                    # Already encrypted, just forward
-                    new_data = content
+                    # Re-encrypt image per client
+                    payload, h = encrypt_image(content, key)
+                    new_data = payload + h
 
                 else:
                     continue

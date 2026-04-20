@@ -44,7 +44,6 @@ def decrypt_image(payload, hash, key):
     verifying_hash = SHA256.new(hmac).digest()
 
     if hash == verifying_hash:
-        print("Image Verified")
         return(image)
     else:
         print("Image Not Verified")
