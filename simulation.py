@@ -1,35 +1,39 @@
 import text_encryption
 
-def simulate_text_messaging():
-    print(" --- TEXT MESSAGE SIMULATION ---\n")
+def simulate_mitm_attack():
+    print(" --- MITM SIMULATION ---\n")
 
     p = 23
     g = 5
 
+    # Private keys
     alice_private = 6
     bob_private = 15
+    mallory_private = 13
 
-    #keys creation
+    # Generating Public keys
     alice_public = text_encryption.generate_public_key(alice_private, g, p)
     bob_public = text_encryption.generate_public_key(bob_private, g, p)
+    mallory_public = text_encryption.generate_public_key(mallory_private, g, p)
 
-    print(f"Alice Public Key: {alice_public}")
-    print(f"Bob Public Key: {bob_public}\n")
+    print("Mallory is intercepting the connection...\n")
 
-    
-    alice_shared = text_encryption.generate_shared_key(bob_public, alice_private, p)
-    bob_shared = text_encryption.generate_shared_key(alice_public, bob_private, p)
+    # Mallory swaps keys
+    alice_shared = text_encryption.generate_shared_key(mallory_public, alice_private, p)
+    bob_shared = text_encryption.generate_shared_key(mallory_public, bob_private, p)
 
-    print(f"Alice Shared Key: {alice_shared}")
-    print(f"Bob Shared Key: {bob_shared}\n")
+    mallory_shared_with_alice = text_encryption.generate_shared_key(alice_public, mallory_private, p)
+    mallory_shared_with_bob = text_encryption.generate_shared_key(bob_public, mallory_private, p)
 
-    
+    # Derive AES keys, so they can be used for encryption
     alice_key = text_encryption.derive_key(alice_shared)
     bob_key = text_encryption.derive_key(bob_shared)
+    mallory_key_alice = text_encryption.derive_key(mallory_shared_with_alice)
+    mallory_key_bob = text_encryption.derive_key(mallory_shared_with_bob)
 
-    # Loop that runs till one user sends exit.
+    print("Compromised Connection established \n")
+
     while True:
-        # ===== Alice sends =====
         msg_alice = input("Alice: ")
         if msg_alice.lower() == "exit":
             print("Chat ended.")
@@ -38,11 +42,23 @@ def simulate_text_messaging():
         C, H = text_encryption.encrypt_text(msg_alice, alice_key)
         print("\nEncrypted message sent to Bob")
 
-        print(f"Ciphertext (C): {C.hex()}")
-        print(f"Hash (H): {H.hex()}\n")
+        #  Mallory intercepts the text
+        intercepted = text_encryption.decrypt_text(C, H, mallory_key_alice)
 
-        # Bob receives
-        bob_msg = text_encryption.decrypt_text(C, H, bob_key)
+        print(f"Mallory sees: {intercepted}")
+
+        # Mallory edits message
+        edited = input("Mallory edit message (press enter to keep same): ")
+        if edited.strip() == "":
+            edited = intercepted
+
+        print(f"Mallory forwards: {edited}\n")
+
+        # Re-encrypt for Bob
+        C2, H2 = text_encryption.encrypt_text(edited, mallory_key_bob)
+
+        # Bob recives
+        bob_msg = text_encryption.decrypt_text(C2, H2, bob_key)
 
         if bob_msg:
             print(f"Bob received: {bob_msg}")
@@ -50,20 +66,32 @@ def simulate_text_messaging():
             print("Bob: Message verification failed!")
             continue
 
-        # ===== Bob replies =====
+        # Bob replies 
         msg_bob = input("\nBob: ")
         if msg_bob.lower() == "exit":
             print("Chat ended.")
             break
 
         C, H = text_encryption.encrypt_text(msg_bob, bob_key)
-        print("\nEncrypted reply sent to Alice")
+        print("\n[Encrypted reply sent to Alice]")
 
-        print(f"Ciphertext (C): {C.hex()}")
-        print(f"Hash (H): {H.hex()}\n")
+        # Mallory intercepts the text
+        intercepted = text_encryption.decrypt_text(C, H, mallory_key_bob)
 
-        # Alice receives
-        alice_msg = text_encryption.decrypt_text(C, H, alice_key)
+        print(f"Mallory sees: {intercepted}")
+
+        # Mallory edits reply
+        edited = input("Mallory edit reply (press enter to keep same): ")
+        if edited.strip() == "":
+            edited = intercepted
+
+        print(f"Mallory forwards: {edited}\n")
+
+        # Re-encrypt for Alice
+        C2, H2 = text_encryption.encrypt_text(edited, mallory_key_alice)
+
+        # Alice receives 
+        alice_msg = text_encryption.decrypt_text(C2, H2, alice_key)
 
         if alice_msg:
             print(f"Alice received: {alice_msg}\n")
@@ -72,4 +100,4 @@ def simulate_text_messaging():
 
 
 if __name__ == "__main__":
-    simulate_text_messaging()
+    simulate_mitm_attack()
