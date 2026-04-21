@@ -19,7 +19,7 @@ def run_client():
 
 def run_simulation():
   try:
-    simulation.simulate_text_messaging()
+    simulation.simulate_mitm_attack()
   except Exception as e:
     print(f"Simulation error: {e}")
 
