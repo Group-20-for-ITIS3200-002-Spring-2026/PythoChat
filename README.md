@@ -1,7 +1,9 @@
 # PythoChat
-Windows 11 Python-based Secure MMS Application with MITM Cyberattack Simulation.
+Windows 11/MacOS Python-based Secure MMS Application with MITM Cyberattack Simulation.
 
 # Instructions:
+NOTE: When running on MacOS, be sure to run pythochat_main.py, not the executable, as the executable will only work on Windows 11.
+
 When running the executable, you will be given 4 options:
 
 1. Host - This creates a server which will allow you to connect multiple clients (SUCCESS CASE).
