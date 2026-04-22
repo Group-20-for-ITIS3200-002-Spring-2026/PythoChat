@@ -16,7 +16,7 @@ Choose the option you would like. If you chose Host, input 0.0.0.0 to allow a co
 NOTE: If you are unable to connect between two computers (one with Host and one with Client), make sure that your firewall is disabled, as it will prevent the file from working properly, and also change your network profile type to the "Private" option.
 
 # Build
-Input the following lines in the Command Line Interface after using the *cd* command to chnage the directory to the one containing the PythoChat files, replacing main.py with the main python file name:
+Input the following lines in the Command Line Interface after using the *cd* command to change the directory to the one containing the PythoChat files, replacing main.py with the main python file name:
 
 ```
 python pythochat_main.py
