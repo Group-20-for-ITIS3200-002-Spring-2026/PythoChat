@@ -1,5 +1,5 @@
 # PythoChat
-Python-based Secure MMS Application with MITM Cyberattack Simulation.
+Windows 11 Python-based Secure MMS Application with MITM Cyberattack Simulation.
 
 # Instructions:
 When running the executable, you will be given 4 options:
@@ -9,9 +9,7 @@ When running the executable, you will be given 4 options:
 3. Simulate Cyberattack - This allows you to simulate a cyberattack (FAILURE CASE).
 4. Exit Application - This allows you to exit the application.
 
-Choose the option you would like. If you chose Host, input 0.0.0.0 to allow a connection from any network adapter. If you chose Client, input the IP address of the server machine's IP address. If you don't know what your machine's IP address is, type the following into your terminal:
-1. Mac/Linux: ifconfig
-2. Windows: ipconfig
+Choose the option you would like. If you chose Host, input 0.0.0.0 to allow a connection from any network adapter. If you chose Client, input the IP address of the server machine's IP address. If you don't know what your machine's IP address is, type *ipconfig* in a terminal.
 
 NOTE: If you are unable to connect between two computers (one with Host and one with Client), make sure that your firewall is disabled, as it will prevent the file from working properly, and also change your network profile type to the "Private" option.
 
